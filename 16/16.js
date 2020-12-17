@@ -18,7 +18,7 @@ fs.readFile(process.argv[2], "utf8", function (err, contents) {
       }
     });
 
-  function merge(ranges) {
+  const merge = (ranges) => {
     let result = [], last;
 
     ranges.forEach(function (r) {
@@ -31,6 +31,8 @@ fs.readFile(process.argv[2], "utf8", function (err, contents) {
     return result;
   }
 
+  const initialRules = JSON.parse(JSON.stringify(input[0]));
+  const initialRulesNb = initialRules.length;
   const [rules, ticket, nearbyTickets] = input;
   const sortedRules = merge(rules
     .reduce((acc, r) => [...acc, ...r])
@@ -49,9 +51,53 @@ fs.readFile(process.argv[2], "utf8", function (err, contents) {
           checks.push(true);
         }
       }
-      if (!checks[0]) invalidValues.push(v);
+      if (!checks[0]) {
+        invalidValues.push(v);
+        delete nearbyTickets[i];
+      }
     }
   }
 
   console.log(invalidValues.reduce((acc, v) => acc + v, 0));
+
+  let oneValidTicket;
+  for (let i = 0; i < nearbyTickets.length; ++i) {
+    const t = nearbyTickets[i];
+    if (t) {
+      oneValidTicket = t;
+      break;
+    }
+  }
+
+  let validityRulesMap = new Map();
+  for (let numberPos = 0; numberPos < oneValidTicket.length; ++numberPos) {
+    validityRulesMap.set(numberPos, initialRules.map(_ => true));
+    for (let i = 0; i < nearbyTickets.length; ++i) {
+      const t = nearbyTickets[i];
+      if (t) {
+        const v = t[numberPos];
+        for (let k = 0; k < initialRulesNb; ++k) {
+          const [r1, r2] = initialRules[k];
+          if ((v < r1[0] || v > r1[1]) && (v < r2[0] || v > r2[1])) {
+            let currentValidity = validityRulesMap.get(numberPos);
+            currentValidity[k] = false;
+            validityRulesMap.set(numberPos, currentValidity);
+          }
+        }
+      }
+    }
+  }
+  // let validityArray = Array.from(validityRulesMap);
+  // while (validityArray.length) {
+  //   for (let k = 1; k <= initialRulesNb; ++k) {
+  //     const nbPos = validityArray.find(([key, value]) => value.filter(x => x).length === k)
+  //     console.log();
+  //   }
+  // }
+
+  console.log(
+    Array.from(validityRulesMap)
+      .filter(([_, value]) => value.slice(0, 6).filter(v => !v).length === 0)
+      .reduce((acc, [k, v]) => acc * k, 1)
+  )
 });
