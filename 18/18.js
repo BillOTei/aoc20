@@ -10,7 +10,7 @@ fs.readFile(process.argv[2], "utf8", function (err, contents) {
     string = string.replace(/\)/g, "]");
     string = string.replace(/\s+/, ", ");
     string = "[" + string + "]";
-    string = string.replace(/[^\[\]\,\s]+/g, "\"$&\"");
+    string = string.replace(/[^\[\],\s]+/g, "\"$&\"");
     string = string.replace(/" /g, "\", ");
 
     return JSON.parse(string);
