@@ -40,10 +40,34 @@ fs.readFile(process.argv[2], "utf8", function (err, contents) {
     return calculate(simpleOp, parseInt(simpleOp[i], 10), i + 1, len);
   }
 
+  const calculate2 = (l, r, i, len) => {
+    if (i >= len) {
+      return r;
+    } else if (Array.isArray(l[i])) {
+      if (l[i + 1] === '+') {
+        return calculate2(l, r + calculate2(l[i], 0, 0, l[i].length), i + 1, len);
+      } else if (l[i + 1] === '*') {
+        return calculate2(l[i], 0, 0, l[i].length) * calculate2(l.slice(i + 1, len), 0, 0, len - i - 1);
+      }
+
+      return calculate2(l[i], 0, 0, l[i].length);
+    } else if (l[i] === '+') {
+      if (Array.isArray(l[i + 1])) {
+        return calculate2(l, r + calculate2(l[i + 1], 0, 0, l[i + 1].length), i + 2, len);
+      }
+
+      return calculate2(l, r + parseInt(l[i + 1], 10), i + 2, len);
+    } else if (l[i] === '*') {
+      return (r || 1) * calculate2(l.slice(i + 1, len), 0, 0, len - i - 1);
+    }
+
+    return calculate2(l, parseInt(l[i], 10), i + 1, len);
+  }
+
   const calculatedLines = input.map(l => {
     const parsed = parse(l);
 
-    return calculate(parsed, 0, 0, parsed.length);
+    return calculate2(parsed, 0, 0, parsed.length);
   })
 
   console.log(calculatedLines.reduce((acc, v) => acc + v))
