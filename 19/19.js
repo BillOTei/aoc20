@@ -44,5 +44,23 @@ fs.readFile(process.argv[2], "utf8", function (err, contents) {
     return `(${subrules.join('|')})`
   }
 
+  // const recurseRule = (r, i, w0, w1) => {
+  //   if (i >= 2) {
+  //     return [w0, w1];
+  //   }
+  //   const [r0, r1] = r;
+  //   const char0 = charsMap.get(r0[i]);
+  //   const char1 = r1 && charsMap.get(r1[i]);
+  //   if (char0 && char1) {
+  //     return recurseRule(r, i + 1,[...w0, char0], [...w1, char1]);
+  //   } else if (char0) {
+  //     return recurseRule(r, i + 1,[...w0, char0], r1 ? [...w1, ...recurseRule(rulesMap.get(r1[i]), 0, [], [])] : w1);
+  //   } else if (char1) {
+  //     return recurseRule(r, i + 1,[...w0, ...recurseRule(rulesMap.get(r0[i]), 0, [], [])], [...w1, char1]);
+  //   }
+  //
+  //   return recurseRule(r, i + 1, [...w0, ...recurseRule(rulesMap.get(r0[i]), 0, [], [])], r1 ? [...w1, ...recurseRule(rulesMap.get(r1[i]), 0, [], [])] : w1);
+  // }
+
   console.log(part1(contents))
 });
